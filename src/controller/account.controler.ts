@@ -9,22 +9,27 @@ let accounts: Account[] = [
   new Account("456", "Andrea", 300, ["21345"]),
 ];
 
-let accountHistory: Operation[] = []; 
+let accountHistory: Operation[] = [];
 
 export const getContacts = (req: Request, res: Response): void => {
   const { minumero } = req.query;
 
+  // Validar si el parámetro no está presente
   if (!minumero) {
     res.status(400).json({ error: "El parámetro 'minumero' es requerido." });
-    return;
+    return; // Asegurarse de detener la ejecución
   }
 
+  // Buscar la cuenta en memoria
   const account = accounts.find((acc) => acc.number === minumero);
   if (!account) {
-    res.status(404).json({ error: `No se encontró la cuenta con número ${minumero}.` });
-    return;
+    res
+      .status(404)
+      .json({ error: `No se encontró la cuenta con número ${minumero}.` });
+    return; // Asegurarse de detener la ejecución
   }
 
+  // Filtrar y mapear los contactos de la cuenta
   const contactDetails = accounts
     .filter((acc) => account.contacts.includes(acc.number))
     .map((contact) => ({ number: contact.number, name: contact.name }));
@@ -37,27 +42,42 @@ export const makePayment = (req: Request, res: Response): void => {
 
   if (!minumero || !numerodestino || !valor) {
     res.status(400).json({
-      error: "Los parámetros 'minumero', 'numerodestino' y 'valor' son requeridos.",
+      error:
+        "Los parámetros 'minumero', 'numerodestino' y 'valor' son requeridos.",
     });
     return;
   }
 
   const originAccount = accounts.find((acc) => acc.number === minumero);
-  const destinationAccount = accounts.find((acc) => acc.number === numerodestino);
+  const destinationAccount = accounts.find(
+    (acc) => acc.number === numerodestino
+  );
 
   if (!originAccount) {
-    res.status(404).json({ error: `No se encontró la cuenta origen con número ${minumero}.` });
+    res
+      .status(404)
+      .json({
+        error: `No se encontró la cuenta origen con número ${minumero}.`,
+      });
     return;
   }
 
   if (!destinationAccount) {
-    res.status(404).json({ error: `No se encontró la cuenta destino con número ${numerodestino}.` });
+    res
+      .status(404)
+      .json({
+        error: `No se encontró la cuenta destino con número ${numerodestino}.`,
+      });
     return;
   }
 
   const paymentAmount = Number(valor);
   if (originAccount.money < paymentAmount) {
-    res.status(400).json({ error: `Saldo insuficiente en la cuenta origen (${originAccount.money}).` });
+    res
+      .status(400)
+      .json({
+        error: `Saldo insuficiente en la cuenta origen (${originAccount.money}).`,
+      });
     return;
   }
 
@@ -65,7 +85,9 @@ export const makePayment = (req: Request, res: Response): void => {
   destinationAccount.money += paymentAmount;
 
   const date = new Date().toLocaleString();
-  accountHistory.push(new Operation(String(minumero), String(numerodestino), date, paymentAmount));
+  accountHistory.push(
+    new Operation(String(minumero), String(numerodestino), date, paymentAmount)
+  );
 
   res.status(200).json({ message: `Pago realizado con éxito el ${date}.` });
 };
@@ -80,7 +102,9 @@ export const getHistory = (req: Request, res: Response): void => {
 
   const account = accounts.find((acc) => acc.number === minumero);
   if (!account) {
-    res.status(404).json({ error: `No se encontró la cuenta con número ${minumero}.` });
+    res
+      .status(404)
+      .json({ error: `No se encontró la cuenta con número ${minumero}.` });
     return;
   }
 
@@ -90,9 +114,13 @@ export const getHistory = (req: Request, res: Response): void => {
 
   const formattedOperations = operations.map((op) => {
     if (op.origin === minumero) {
-      return `Pago realizado de ${op.amount} a ${accounts.find((acc) => acc.number === op.destination)?.name}`;
+      return `Pago realizado de ${op.amount} a ${
+        accounts.find((acc) => acc.number === op.destination)?.name
+      }`;
     } else {
-      return `Pago recibido de ${op.amount} de ${accounts.find((acc) => acc.number === op.origin)?.name}`;
+      return `Pago recibido de ${op.amount} de ${
+        accounts.find((acc) => acc.number === op.origin)?.name
+      }`;
     }
   });
 
