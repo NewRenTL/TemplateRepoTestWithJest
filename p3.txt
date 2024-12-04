@@ -1,0 +1,10 @@
+Para soportar las nuevas funcionalidades :
+- Adicionar una validacion del máximo número de contactos.
+- Eliminación de contactos  y de usuarios 
+
+Se necesitan cambios en las clases Usuario y DataHandler. En Usuario, se debe agregar una constante para definir el máximo número de contactos permitido y modificar el método agregarContacto para validar que no se exceda este límite, lanzando un error si ocurre. Además, se debe incluir un método eliminarContacto para eliminar contactos de la lista sin afectar los mensajes enviados o recibidos, que deben mantenerse intactos. En DataHandler, se debe agregar un método eliminarUsuario que permita eliminar usuarios de forma que sus mensajes se mantengan en los historiales de otros usuarios. Por último, el Controller necesitará endpoints para eliminar contactos y usuarios.
+Los nuevos casos de prueba incluyen la validación del límite máximo de contactos, tanto en escenarios de éxito como de error, y la eliminación de contactos y usuarios. Esto incluye pruebas para casos como eliminar contactos existentes o inexistentes y garantizar que los mensajes no se pierdan tras eliminar usuarios.
+
+Cuanto riesgo hay de romper lo que ya funciona?
+
+El riesgo de "romper" el código existente es moderado, ya que las validaciones y nuevas funcionalidades podrían introducir errores si no se manejan correctamente las referencias a contactos y mensajes. Este riesgo se puede evitarr mediante pruebas unitarias.
